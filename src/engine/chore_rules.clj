@@ -16,6 +16,6 @@
 
 (defrule is-core-chore
   "Marks the status of a chore"
-  [ChoreDetails (= :vacuum chore-type)]
+  [ChoreDetails (some? chore-type)]
   =>
   (insert! (->ChoreChecker :completed)))
