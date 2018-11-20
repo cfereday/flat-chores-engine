@@ -11,8 +11,10 @@
 
 
 (defquery chore-announcements
-  []
-  [?announcement <- ChoreAnnouncement])
+  "Query to find the completed chores"
+  [:?status]
+  [?announcement <- ChoreAnnouncement (== ?status status)])
+
 
 
 (defrule is-core-chore

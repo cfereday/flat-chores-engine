@@ -5,13 +5,24 @@
             [clara.tools.inspect :refer :all]))
 
 
-(deftest checks-chores
+
+#_(deftest checks-chores
   (testing "Counts how many core chores are completed"
 
     (let [session (-> (mk-session 'engine.chore)
                     (insert (->CoreChore "Hoovering" :core))
-                    (fire-rules))]
+                    (fire-rules))
+          query (query session chore-announcements :?status :completed)]
       (prn "inspected" (clojure.pprint/pprint (:insertions (inspect session))))
-      (prn "all " (query session flatmate-chores))
-      (prn "announcements " (query session chore-announcements))
-      )))
+      (prn "announcement status" query)
+      (is (some? query))))
+
+  (testing "Counts which announcements completed"
+
+    (let [session (-> (mk-session 'engine.chore)
+                    (insert (->CoreChore "Hoovering" :core))
+                    (fire-rules))
+          query (query session chore-announcements :?status :completed)]
+      (prn "inspected" (clojure.pprint/pprint (:insertions (inspect session))))
+      (prn "announcement status" query)
+      (is (some? query)))))
