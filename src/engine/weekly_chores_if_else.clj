@@ -28,19 +28,3 @@
         (prn "Oh no you didn't do your chores, please buy your flatmates pizza for the flat sunday night movie!")))
 
 
-
-
-;did chore
-;
-;hired-cleaner
-;
-;carry-over
-;
-;off-sick
-
-
-;get to choose movie
-
-;owe flatemate x number of chores
-
-
