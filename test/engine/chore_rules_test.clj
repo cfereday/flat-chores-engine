@@ -8,22 +8,24 @@
 ;- how to have more meaningful assertions rather than just asserting not empty?
 ;- How to get the value of flatmate-name from the defrecord
 
+
+
 (deftest checks-chores
   (testing "If a flatmate has completed a chore their chore status is marked as completed"
     (let [session (-> (mk-session 'engine.chore-rules)
-                    (insert (->WeeklyReport :vacuum "Charlotte" false false false))
+                    (insert (->WeeklyReport :vacuum "Charlotte" nil nil false))
                     (fire-rules))
           query (query session chore-outcomes)
           mapped-query (into {} query)]
       (is (= (:?chore-status mapped-query) :completed))))
 
-  (testing "If a flatmate has not completed a chore or not added their name they do not have a completed status"
+  #_(testing "If a flatmate has not completed a chore or not added their name they do not have a completed status"
     (let [no-chore-session (-> (mk-session 'engine.chore-rules)
-                    (insert (->WeeklyReport nil "Charlotte" false false false))
+                    (insert (->WeeklyReport nil "Charlotte" nil nil nil))
                     (fire-rules))
 
           no-name-session (-> (mk-session 'engine.chore-rules)
-                            (insert (->WeeklyReport :vacuum nil false false false))
+                            (insert (->WeeklyReport :vacuum nil nil nil nil))
                             (fire-rules))
 
           query-1 (query no-chore-session chore-outcomes)
@@ -35,7 +37,7 @@
 
   (testing "If a flatmate hired a cleaner to complete their chore, their chore status is completed"
     (let [session (-> (mk-session 'engine.chore-rules)
-                    (insert (->WeeklyReport nil "Charlotte" :vacuum false false))
+                    (insert (->WeeklyReport nil "Charlotte" :vacuum nil nil))
                     (fire-rules))
           query (query session chore-outcomes)
           mapped-query (into {} query)]
@@ -44,7 +46,7 @@
 
   (testing "If another flatmate has done the task for the flatmate their chore status is completed"
     (let [session (-> (mk-session 'engine.chore-rules)
-                    (insert (->WeeklyReport nil "Charlotte" nil :vacuum false))
+                    (insert (->WeeklyReport nil "Charlotte" nil :vacuum nil))
                     (fire-rules))
           query (query session chore-outcomes)
           mapped-query (into {} query)]
@@ -52,9 +54,9 @@
       (prn "mapped query" mapped-query)
       (is (= (:?chore-status mapped-query) :completed))))
 
-  #_(testing "If a flatemate was ill their chore status is marked as exempt"
+  (testing "If a flatmate was ill their chore status is marked as exempt and their illness is down in lieu of a chore"
     (let [session (-> (mk-session 'engine.chore-rules)
-                    (insert (->WeeklyReport nil "Charlotte" nil false true))
+                    (insert (->WeeklyReport nil "Charlotte" nil nil :flu))
                     (fire-rules))
           query (query session chore-outcomes)
           mapped-query (into {} query)]

@@ -30,7 +30,8 @@
    [:or
     [WeeklyReport (= ?chore chore-type) (= ?status :completed) (is-legitimate-chore? chore-type)]
     [WeeklyReport (= ?chore chore-completed-by-cleaner) (= ?status :completed) (is-legitimate-chore? chore-completed-by-cleaner)]
-    [WeeklyReport (= ?chore chore-completed-by-other-flatmate) (= ?status :completed) (is-legitimate-chore? chore-completed-by-other-flatmate)]]
+    [WeeklyReport (= ?chore chore-completed-by-other-flatmate) (= ?status :completed) (is-legitimate-chore? chore-completed-by-other-flatmate)]
+    [WeeklyReport (= ?chore flatmate-ill) (= ?status :exempt)]]
    [WeeklyReport (= ?name flatmate-name) (some? flatmate-name)]]
   =>
   (insert! (map->ChoreOutcome {:chore-status ?status :chore ?chore :flatmate-name ?name})))
