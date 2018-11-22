@@ -19,10 +19,17 @@
   (contains? #{:vacuum :kitchen :bathroom} chore-type))
 
 
+(defn chore-assigner
+  [flat-mate-chore cleaner-chore]
+  (if (some? flat-mate-chore) flat-mate-chore
+             cleaner-chore))
+
 (defrule flatmate-completed-chore
   "If a flatmate has completed a chore their chore status is completed"
   [:and
-   [WeeklyReport (= ?chore chore-type) (is-legitimate-chore? chore-type)]
+   [:or
+    [WeeklyReport (= ?chore chore-type) (is-legitimate-chore? chore-type)]
+    [WeeklyReport (= ?chore chore-completed-by-cleaner) (is-legitimate-chore? chore-completed-by-cleaner)]]
    [WeeklyReport (= ?name flatmate-name) (some? flatmate-name)]]
   =>
   (insert! (map->ChoreOutcome {:chore-status :completed :chore ?chore :flatmate-name ?name})))

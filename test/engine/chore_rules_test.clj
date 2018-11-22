@@ -33,7 +33,7 @@
       (is (and (= (:?chore-status mapped-query-1) nil) (= (:?chore-status mapped-query-2) nil)))))
 
 
-  #_(testing "If a flatmate hired a cleaner to complete their chore, their chore status is completed"
+  (testing "If a flatmate hired a cleaner to complete their chore, their chore status is completed"
     (let [session (-> (mk-session 'engine.chore-rules)
                     (insert (->WeeklyReport nil "Charlotte" :vacuum false false))
                     (fire-rules))
