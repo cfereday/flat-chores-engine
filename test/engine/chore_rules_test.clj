@@ -41,7 +41,7 @@
 
   (testing "If a flatmate was ill their chore status is marked as exempt and their illness is down in lieu of a chore"
     (let [session (-> (mk-session 'engine.chore-rules)
-                    (insert (->WeeklyReport nil "Charlotte" nil nil :flu))
+                    (insert (->WeeklyReport nil "Charlotte" nil nil true))
                     (fire-rules))
           query (query session chore-outcomes)
           mapped-query (into {} query)]
