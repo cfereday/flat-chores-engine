@@ -1,48 +1,66 @@
 (ns engine.chore-rules
-  (:require [clara.rules :refer :all]))
+  (:require [clara.rules :refer :all]
+            [clara.rules.accumulators :as acc]))
 
 
-(defrecord ChoreDetails [chore-type])
+(defrecord WeeklyReport [chore-type flatmate-name chore-completed-by-cleaner other-flatmate-completed-chore flatmate-ill])
 
-(defrecord FlatMateName [flatmate-name])
-
-(defrecord CleanerDetails [chore-type])
-
-(defrecord ChoreChecker [chore-status flatmate-name])
-
-(defrecord FlatMateIll [illness])
+(defrecord ChoreOutcome [chore-status flatmate-name chore])
 
 
 (defquery chore-outcomes
   "Query to find the completed chores"
   []
-  [?result <- ChoreChecker])
+  [ChoreOutcome (= ?chore-status chore-status)])
 
 
-(defrule flatmate-chore-checker
+(defn is-legitimate-chore?
+  [chore-type]
+  (contains? #{:vacuum :kitchen :bathroom} chore-type))
+
+
+(defrule flatmate-completed-chore
   "If a flatmate has completed a chore their chore status is completed"
-  [ChoreDetails (some? chore-type)]
-  [FlatMateName (some? flatmate-name)]
+  [:and
+   [WeeklyReport (= ?chore chore-type) (is-legitimate-chore? chore-type)]
+   [WeeklyReport (= ?name flatmate-name) (some? flatmate-name)]]
   =>
-  (insert! (->ChoreChecker :completed FlatMateName)))
+  (insert! (map->ChoreOutcome {:chore-status :completed :chore ?chore :flatmate-name ?name})))
 
 
-(defrule cleaner-hired-chore-checker
+#_(defrule cleaner-hired-chore-checker
   "If a flatmate has hired a cleaner to complete a chore their chore status is completed"
   [CleanerDetails (some? chore-type)]
-  [FlatMateName (some? flatmate-name)]
   =>
-  (insert! (->ChoreChecker :completed FlatMateName)))
+  (insert! (->ChoreOutcome :completed FlatMateName)))
 
 
-(defrule flatmate-illness-checker
+#_(defrule an-ill-flatmate-is-exempt
   "If a flatmate has been ill their chore status is marked as exempt"
   [FlatMateIll (= :flu illness)]
   =>
-  (insert! (->ChoreChecker :exempt FlatMateName)))
+  (insert! (->ChoreOutcome :exempt FlatMateName)))
 
-(defrule flatmate-skipped-chore
+#_(defrule flatmate-skipped-chore
   "If a flatmate has skipped a chore their status is marked as incompleted"
-  [ChoreDetails (nil? chore-type)]
+  [WeeklyReport (nil? chore-type)]
   =>
-  (insert! (->ChoreChecker :incomplete FlatMateName)))
+  (insert! (->ChoreOutcome :incomplete FlatMateName)))
+
+
+
+
+;:todo notes for talk
+;Statements of facts based on other facts
+;Pass in a lot of raw data that can be handled by rules
+;Rules can handle multiple facts
+;Able to grow complexity for the queries without these interacting
+; flatmate & chore k
+;certain level of intricacy
+;chain of things - different ways to complete chores - do they need to be different rules? probably not, would want different queries
+;queries
+;count number of chores
+;when enough chores are done , insert all done
+;get to choose movie if all chores done & not exempt
+
+
