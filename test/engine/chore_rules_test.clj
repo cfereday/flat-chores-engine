@@ -7,7 +7,7 @@
 (deftest checks-chores
   (testing "If a flatmate has completed a chore their chore status is marked as completed"
     (let [session (-> (mk-session 'engine.chore-rules)
-                    (insert (->WeeklyReport :vacuum "Charlotte" nil nil nil))
+                    (insert (->WeeklyReport :vacuum "Charlotte" nil nil false))
                     (fire-rules))
           query (query session chore-outcomes)
           mapped-query (into {} query)]
@@ -41,7 +41,7 @@
 
   (testing "If a flatmate was ill their chore status is marked as exempt and their illness is down in lieu of a chore"
     (let [session (-> (mk-session 'engine.chore-rules)
-                    (insert (->WeeklyReport nil "Charlotte" nil nil true))
+                    (insert (->WeeklyReport nil "Charlotte" nil nil "flu"))
                     (fire-rules))
           query (query session chore-outcomes)
           mapped-query (into {} query)]
@@ -61,6 +61,21 @@
       (is (and (= (:?chore-status mapped-query) :incomplete)
             (= (:?flatmate-name mapped-query) "Charlotte")
             (= (:?chore mapped-query) :missing))))))
+
+
+(deftest checks-chore-outcomes
+  #_(testing "If a flatmate completed their chore they are able to pick the sunday movie"
+    (let [session (-> (mk-session 'engine.chore-rules)
+                    (insert (->WeeklyReport :vacuum "Charlotte" nil nil nil))
+                    (fire-rules))
+          query (query session chore-outcomes)
+          mapped-query (into {} query)]
+      (is (and
+            (= (:?chore-status mapped-query) :exempt)
+            (= (:?flatmate-name mapped-query) "Charlotte")
+            (= (:?chore mapped-query) :missing)))))
+
+  )
 
 
 

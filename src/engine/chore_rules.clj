@@ -30,7 +30,7 @@
     [WeeklyReport (= ?chore chore-type) (= ?status :completed) (is-legitimate-chore? chore-type)]
     [WeeklyReport (= ?chore chore-completed-by-cleaner) (= ?status :completed) (is-legitimate-chore? chore-completed-by-cleaner)]
     [WeeklyReport (= ?chore chore-completed-by-other-flatmate) (= ?status :completed) (is-legitimate-chore? chore-completed-by-other-flatmate)]
-    [WeeklyReport (= ?chore :missing) (= ?status :exempt) (= true flatmate-ill)]
+    [WeeklyReport (= ?chore :missing) (= ?status :exempt) (some? flatmate-ill)]
     [WeeklyReport (= ?chore :missing) (= ?status :incomplete) (has-not-completed-a-chore? (take-while nil? [chore-type chore-completed-by-cleaner chore-completed-by-other-flatmate flatmate-ill]))]
     ]
    [:or
