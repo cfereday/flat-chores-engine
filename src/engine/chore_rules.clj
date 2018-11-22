@@ -28,12 +28,12 @@
   "If a flatmate has completed a chore their chore status is completed"
   [:and
    [:or
-    [WeeklyReport (= ?chore chore-type) (is-legitimate-chore? chore-type)]
-    [WeeklyReport (= ?chore chore-completed-by-cleaner) (is-legitimate-chore? chore-completed-by-cleaner)]
-    [WeeklyReport (= ?chore chore-completed-by-other-flatmate) (is-legitimate-chore? chore-completed-by-other-flatmate)]]
+    [WeeklyReport (= ?chore chore-type) (= ?status :completed) (is-legitimate-chore? chore-type)]
+    [WeeklyReport (= ?chore chore-completed-by-cleaner) (= ?status :completed) (is-legitimate-chore? chore-completed-by-cleaner)]
+    [WeeklyReport (= ?chore chore-completed-by-other-flatmate) (= ?status :completed) (is-legitimate-chore? chore-completed-by-other-flatmate)]]
    [WeeklyReport (= ?name flatmate-name) (some? flatmate-name)]]
   =>
-  (insert! (map->ChoreOutcome {:chore-status :completed :chore ?chore :flatmate-name ?name})))
+  (insert! (map->ChoreOutcome {:chore-status ?status :chore ?chore :flatmate-name ?name})))
 
 #_(defrule an-ill-flatmate-is-exempt
   "If a flatmate has been ill their chore status is marked as exempt"
