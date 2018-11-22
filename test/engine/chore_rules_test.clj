@@ -56,25 +56,41 @@
                     (fire-rules))
           query (query session chore-outcomes)
           mapped-query (into {} query)]
-      (prn "HERE IS query" query)
-      (prn "inspected" (clojure.pprint/pprint (:insertions (inspect session))))
       (is (and (= (:?chore-status mapped-query) :incomplete)
             (= (:?flatmate-name mapped-query) "Charlotte")
             (= (:?chore mapped-query) :missing))))))
 
 
 (deftest checks-chore-outcomes
-  #_(testing "If a flatmate completed their chore they are able to pick the sunday movie"
+  (testing "If a flatmate completed their chore they are able to pick the sunday movie"
     (let [session (-> (mk-session 'engine.chore-rules)
                     (insert (->WeeklyReport :vacuum "Charlotte" nil nil nil))
                     (fire-rules))
-          query (query session chore-outcomes)
+          query (query session can-choose-a-movie?)
           mapped-query (into {} query)]
       (is (and
-            (= (:?chore-status mapped-query) :exempt)
-            (= (:?flatmate-name mapped-query) "Charlotte")
-            (= (:?chore mapped-query) :missing)))))
+            (= (:?eligibility mapped-query) :pick-movie)
+            (= (:?flatmate-name mapped-query) "Charlotte")))))
 
+  (testing "If a flatmate didn't complete their chore or are exempt they aren't able to pick the sunday movie"
+    (let [incomplete-session (-> (mk-session 'engine.chore-rules)
+                    (insert (->WeeklyReport nil "Charlotte" nil nil nil))
+                    (fire-rules))
+          exempt-session (-> (mk-session 'engine.chore-rules)
+                           (insert (->WeeklyReport nil "Charlotte" nil nil "flu"))
+                           (fire-rules))
+          incomplete-query (query incomplete-session can-choose-a-movie?)
+          exempt-query     (query exempt-session can-choose-a-movie?)
+          mapped-incomplete-query (into {} incomplete-query)
+          mapped-exempt-query (into {} exempt-query)]
+      (prn "HERE IS query" query)
+      (prn "inspected" (clojure.pprint/pprint (:insertions (inspect incomplete-session))))
+      (is (and
+            (= (:?eligibility mapped-incomplete-query) :no-movie-picking)
+            (= (:?flatmate-name mapped-incomplete-query) "Charlotte")))
+      (is (and
+            (= (:?eligibility mapped-exempt-query) :no-movie-picking)
+            (= (:?flatmate-name mapped-incomplete-query) "Charlotte")))))
   )
 
 

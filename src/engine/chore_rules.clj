@@ -7,11 +7,19 @@
 
 (defrecord ChoreOutcome [chore-status flatmate-name chore])
 
+(defrecord MoviePicker [eligibility flatmate-name])
+
 
 (defquery chore-outcomes
   "Querying the chore outcome keys"
   []
   [ChoreOutcome (= ?chore-status chore-status) (= ?flatmate-name flatmate-name) (= ?chore chore)])
+
+
+(defquery can-choose-a-movie?
+  "Checks if the flatmate is eligible to chose a movie"
+  []
+  [MoviePicker (= ?eligibility eligibility) (= ?flatmate-name flatmate-name)])
 
 
 (defn is-legitimate-chore?
@@ -22,8 +30,13 @@
   [chore-or-ill]
   (= '(true true true true) (map nil? chore-or-ill)))
 
+
+(defn is-eligible?
+  [chore-status flatmate-name]
+  (and (= :completed chore-status) (not (= :missing flatmate-name))))
+
 (defrule chore-checker
-  "Updates the chore outcome"
+  "Updates the chore outcome for an individual flatmate"
   ;:todo consider refactoring the :completed cases as repetitive
   [:and
    [:or
@@ -38,6 +51,14 @@
     [WeeklyReport (= ?name :missing) (nil? flatmate-name)]]]
   =>
   (insert! (map->ChoreOutcome {:chore-status ?status :chore ?chore :flatmate-name ?name})))
+
+(defrule chore-outcome-checker
+  "Updates the movie picker for an individual flatmate"
+  [:or
+   [ChoreOutcome (= ?status :pick-movie) (= ?name flatmate-name flatmate-name) (is-eligible? chore-status flatmate-name)]
+   [ChoreOutcome (= ?status :no-movie-picking) (= ?name flatmate-name) (not (is-eligible? chore-status flatmate-name))]]
+  =>
+  (insert! (map->MoviePicker {:eligibility ?status :flatmate-name ?name})))
 
 
 
