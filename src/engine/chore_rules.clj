@@ -9,45 +9,34 @@
 
 
 (defquery chore-outcomes
-  "Query to find the completed chores"
+  "Querying the chore outcome keys"
   []
-  [ChoreOutcome (= ?chore-status chore-status)])
+  [ChoreOutcome (= ?chore-status chore-status) (= ?flatmate-name flatmate-name) (= ?chore chore)])
 
 
 (defn is-legitimate-chore?
   [chore-type]
   (contains? #{:vacuum :kitchen :bathroom} chore-type))
 
-
-(defn chore-assigner
-  [flat-mate-chore cleaner-chore]
-  (if (some? flat-mate-chore) flat-mate-chore
-             cleaner-chore))
+(defn has-not-completed-a-chore?
+  [chore-or-ill]
+  (= '(true true true true) (map nil? chore-or-ill)))
 
 (defrule chore-checker
-  "If a flatmate has completed a chore their chore status is completed"
+  "Updates the chore outcome"
   [:and
    [:or
     [WeeklyReport (= ?chore chore-type) (= ?status :completed) (is-legitimate-chore? chore-type)]
     [WeeklyReport (= ?chore chore-completed-by-cleaner) (= ?status :completed) (is-legitimate-chore? chore-completed-by-cleaner)]
     [WeeklyReport (= ?chore chore-completed-by-other-flatmate) (= ?status :completed) (is-legitimate-chore? chore-completed-by-other-flatmate)]
-    [WeeklyReport (= ?chore flatmate-ill) (= ?status :exempt)]]
-   [WeeklyReport (= ?name flatmate-name) (some? flatmate-name)]]
+    [WeeklyReport (= ?chore :missing) (= ?status :exempt) (some? flatmate-ill)]
+    [WeeklyReport (= ?chore :missing) (= ?status :incomplete) (has-not-completed-a-chore? (take-while nil? [chore-type chore-completed-by-cleaner chore-completed-by-other-flatmate flatmate-ill]))]
+    ]
+   [:or
+    [WeeklyReport (= ?name flatmate-name) (some? flatmate-name)]
+    [WeeklyReport (= ?name :missing) (nil? flatmate-name)]]]
   =>
   (insert! (map->ChoreOutcome {:chore-status ?status :chore ?chore :flatmate-name ?name})))
-
-#_(defrule an-ill-flatmate-is-exempt
-  "If a flatmate has been ill their chore status is marked as exempt"
-  [FlatMateIll (= :flu illness)]
-  =>
-  (insert! (->ChoreOutcome :exempt FlatMateName)))
-
-#_(defrule flatmate-skipped-chore
-  "If a flatmate has skipped a chore their status is marked as incompleted"
-  [WeeklyReport (nil? chore-type)]
-  =>
-  (insert! (->ChoreOutcome :incomplete FlatMateName)))
-
 
 
 
