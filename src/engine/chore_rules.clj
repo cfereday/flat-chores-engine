@@ -3,7 +3,7 @@
             [clara.rules.accumulators :as acc]))
 
 
-(defrecord WeeklyReport [chore-type flatmate-name chore-completed-by-cleaner other-flatmate-completed-chore flatmate-ill])
+(defrecord WeeklyReport [chore-type flatmate-name chore-completed-by-cleaner chore-completed-by-other-flatmate flatmate-ill])
 
 (defrecord ChoreOutcome [chore-status flatmate-name chore])
 
@@ -24,23 +24,16 @@
   (if (some? flat-mate-chore) flat-mate-chore
              cleaner-chore))
 
-(defrule flatmate-completed-chore
+(defrule chore-checker
   "If a flatmate has completed a chore their chore status is completed"
   [:and
    [:or
     [WeeklyReport (= ?chore chore-type) (is-legitimate-chore? chore-type)]
-    [WeeklyReport (= ?chore chore-completed-by-cleaner) (is-legitimate-chore? chore-completed-by-cleaner)]]
+    [WeeklyReport (= ?chore chore-completed-by-cleaner) (is-legitimate-chore? chore-completed-by-cleaner)]
+    [WeeklyReport (= ?chore chore-completed-by-other-flatmate) (is-legitimate-chore? chore-completed-by-other-flatmate)]]
    [WeeklyReport (= ?name flatmate-name) (some? flatmate-name)]]
   =>
   (insert! (map->ChoreOutcome {:chore-status :completed :chore ?chore :flatmate-name ?name})))
-
-
-#_(defrule cleaner-hired-chore-checker
-  "If a flatmate has hired a cleaner to complete a chore their chore status is completed"
-  [CleanerDetails (some? chore-type)]
-  =>
-  (insert! (->ChoreOutcome :completed FlatMateName)))
-
 
 #_(defrule an-ill-flatmate-is-exempt
   "If a flatmate has been ill their chore status is marked as exempt"

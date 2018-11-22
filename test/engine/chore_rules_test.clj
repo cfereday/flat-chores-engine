@@ -39,16 +39,26 @@
                     (fire-rules))
           query (query session chore-outcomes)
           mapped-query (into {} query)]
+      (prn "mapped query" mapped-query)
+      (is (= (:?chore-status mapped-query) :completed))))
+
+  (testing "If another flatmate has done the task for the flatmate their chore status is completed"
+    (let [session (-> (mk-session 'engine.chore-rules)
+                    (insert (->WeeklyReport nil "Charlotte" nil :vacuum false))
+                    (fire-rules))
+          query (query session chore-outcomes)
+          mapped-query (into {} query)]
       (prn "inspected" (clojure.pprint/pprint (:insertions (inspect session))))
       (prn "mapped query" mapped-query)
       (is (= (:?chore-status mapped-query) :completed))))
 
   #_(testing "If a flatemate was ill their chore status is marked as exempt"
     (let [session (-> (mk-session 'engine.chore-rules)
-                    (insert (->FlatMateIll :flu))
+                    (insert (->WeeklyReport nil "Charlotte" nil false true))
                     (fire-rules))
-          query (query session chore-outcomes)]
-      (is (not-empty query))))
+          query (query session chore-outcomes)
+          mapped-query (into {} query)]
+      (is (= (:?chore-status mapped-query) :exempt))))
 
   #_(testing "If a flatmate has not completed a chore & hired no cleaner their chore status is marked as incomplete"
     (let [session (-> (mk-session 'engine.chore-rules)
