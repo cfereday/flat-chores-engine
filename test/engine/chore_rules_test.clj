@@ -62,41 +62,46 @@
 
 
 (deftest checks-chores-for-whole-flat
-    (let [session (-> (mk-session 'engine.chore-rules)
-                    (insert (->WeeklyReport
-                              {:chore-type                        :vacuum
-                               :flatmate-name                     "Charlotte"
-                               :chore-completed-by-cleaner        nil
-                               :chore-completed-by-other-flatmate nil
-                               :flatmate-ill                      nil}
-                              #_{:chore-type                        :kitchen
-                               :flatmate-name                     "Felipe"
-                               :chore-completed-by-cleaner        nil
-                               :chore-completed-by-other-flatmate nil
-                               :flatmate-ill                      nil}
-                              #_{:chore-type                        :bathroom
-                               :flatmate-name                     "Christoph"
-                               :chore-completed-by-cleaner        nil
-                               :chore-completed-by-other-flatmate nil
-                               :flatmate-ill                      nil}))
-                    (fire-rules))
-          flatmate-report-query (query session flatmate-reports)
-          all-records-report-query (query session all-records)
-          mapped-query (into {} flatmate-report-query)
-          mapped-query-all-records (into {} all-records-report-query)]
+  (let [session (-> (mk-session 'engine.chore-rules)
+                  (insert (->WeeklyReport
+                            {:chore-type                        :vacuum
+                             :flatmate-name                     "Charlotte"
+                             :chore-completed-by-cleaner        nil
+                             :chore-completed-by-other-flatmate nil
+                             :flatmate-ill                      nil}
 
-      (prn "HERE IS ALL RECORDS query" all-records)
-      (prn "HERE IS FLATMATE REPORT query" flatmate-report-query)
-      (prn "HERE IS MAPPED query" mapped-query)
-      (prn "HERE IS ALL RECORDS MAPPED query" mapped-query-all-records)
-      (prn "HERE IS TRYIONG TO GET A KEY" (:?all-records mapped-query-all-records))
-      (prn "inspected session" (clojure.pprint/pprint (:insertions (inspect session))))
-      (is (= (some? mapped-query-all-records))
+                            #_{:chore-type                        :kitchen
+                             :flatmate-name                     "Felipe"
+                             :chore-completed-by-cleaner        nil
+                             :chore-completed-by-other-flatmate nil
+                             :flatmate-ill                      nil}
 
+                            #_:chores-3 #_{:flatmate-3 {:chore-type                        :bathroom
+                                                        :flatmate-name                     "Christoph"
+                                                        :chore-completed-by-cleaner        nil
+                                                        :chore-completed-by-other-flatmate nil
+                                                        :flatmate-ill                      nil}}))
+                  (fire-rules))
+        report-query (query session flatmate-reports)
+        movie-query (query session can-choose-a-movie?)
+        mapped-query (into {} movie-query)
+        report-mapped-query (into {} report-query)]
+    (prn "HERE IS FLATMATE REPORT query" movie-query)
+    (prn "HERE IS MAPPED query" mapped-query)
+    (prn "inspected session" (clojure.pprint/pprint (:insertions (inspect session))))
+    (is (and
+          (= (:?eligibility mapped-query) :pick-movie)
+          (= (:?flatmate-name mapped-query) "Charlotte")))
+    #_(is (and
+          (= (:?eligibility mapped-query) :pick-movie)
+          (= (:?flatmate-name mapped-query) "Felipe")))
 
-        #_(and
-            (= (:?chore-type mapped-query) :kitchen)
-            (= (:?flatmate-name mapped-query) "Felipe")))))
+    (is (and
+          (= (:?chore-type report-mapped-query) :vacuum)
+          (= (:?flatmate-name report-mapped-query) "Charlotte")))
+    #_(is (and
+          (= (:?chore-type report-mapped-query) :kitchen)
+          (= (:?flatmate-name report-mapped-query) "Felipe")))))
 
 
 (deftest checks-movie-picker
