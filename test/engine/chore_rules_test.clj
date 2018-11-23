@@ -70,7 +70,7 @@
                              :chore-completed-by-other-flatmate nil
                              :flatmate-ill                      nil}
 
-                            #_{:chore-type                        :kitchen
+                            {:chore-type                        :kitchen
                              :flatmate-name                     "Felipe"
                              :chore-completed-by-cleaner        nil
                              :chore-completed-by-other-flatmate nil
@@ -84,24 +84,30 @@
                   (fire-rules))
         report-query (query session flatmate-reports)
         movie-query (query session can-choose-a-movie?)
-        mapped-query (into {} movie-query)
-        report-mapped-query (into {} report-query)]
-    (prn "HERE IS FLATMATE REPORT query" movie-query)
-    (prn "HERE IS MAPPED query" mapped-query)
+        movie-mapped-query (into {} movie-query)
+        report-mapped-query (into [] (into {} report-query))
+        charlotte-report (first report-mapped-query)
+        felipe-report (first report-mapped-query)
+
+        ]
+    (prn "HERE IS REPORT query******" report-query)
+    (prn "HERE IS MOVIE query----------" movie-query)
+    (prn "HERE IS REPORT MAPPED query******" report-mapped-query)
+    (prn "HERE IS MOVIE MAPPED query----------" movie-mapped-query)
     (prn "inspected session" (clojure.pprint/pprint (:insertions (inspect session))))
     (is (and
-          (= (:?eligibility mapped-query) :pick-movie)
-          (= (:?flatmate-name mapped-query) "Charlotte")))
-    #_(is (and
-          (= (:?eligibility mapped-query) :pick-movie)
-          (= (:?flatmate-name mapped-query) "Felipe")))
+          (= (:?eligibility movie-mapped-query) :pick-movie)
+          (= (:?flatmate-name movie-mapped-query) "Charlotte")))
+    (is (and
+          (= (:?eligibility movie-mapped-query) :pick-movie)
+          (= (:?flatmate-name movie-mapped-query) "Felipe")))
 
     (is (and
-          (= (:?chore-type report-mapped-query) :vacuum)
-          (= (:?flatmate-name report-mapped-query) "Charlotte")))
-    #_(is (and
-          (= (:?chore-type report-mapped-query) :kitchen)
-          (= (:?flatmate-name report-mapped-query) "Felipe")))))
+          (= (:?chore-type charlotte-report) :vacuum)
+          (= (:?flatmate-name charlotte-report) "Charlotte")))
+    (is (and
+          (= (:?chore-type felipe-report) :kitchen)
+          (= (:?flatmate-name felipe-report) "Felipe")))))
 
 
 (deftest checks-movie-picker

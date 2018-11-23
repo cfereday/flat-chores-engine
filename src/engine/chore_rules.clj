@@ -7,7 +7,7 @@
 
 (defrecord ChoreOutcome [chore-status flatmate-name chore])
 
-(defrecord WeeklyReport [chores1 #_chores2 #_chores3])
+(defrecord WeeklyReport [chores1 chores2 #_chores3])
 
 (defrecord MoviePicker [eligibility flatmate-name])
 
@@ -50,23 +50,25 @@
   [WeeklyReport (= ?flatmate-ill (:flatmate-ill chores1)) (some? chores1)]
 
 
-  #_[WeeklyReport (= ?chore-type-2 (:chore-type chores2)) (some? chores2)]
-  #_[WeeklyReport (= ?flatmate-name-2 (:flatmate-name chores2)) (some? chores2)]
-  #_[WeeklyReport (= ?chore-completed-by-cleaner-2 (:chore-completed-by-cleaner chores2)) (some? chores2)]
-  #_[WeeklyReport (= ?chore-completed-by-other-flatmate-2 (:chore-completed-by-other-flatmate chores2)) (some? chores2)]
-  #_[WeeklyReport (= ?flatmate-ill-2 (:flatmate-ill chores2)) (some? chores2)]
+  [WeeklyReport (= ?chore-type-2 (:chore-type chores2)) (some? chores2)]
+  [WeeklyReport (= ?flatmate-name-2 (:flatmate-name chores2)) (some? chores2)]
+  [WeeklyReport (= ?chore-completed-by-cleaner-2 (:chore-completed-by-cleaner chores2)) (some? chores2)]
+  [WeeklyReport (= ?chore-completed-by-other-flatmate-2 (:chore-completed-by-other-flatmate chores2)) (some? chores2)]
+  [WeeklyReport (= ?flatmate-ill-2 (:flatmate-ill chores2)) (some? chores2)]
 
   =>
-  (insert! (map->FlatMateReport {:chore-type                        ?chore-type
-                                     :flatmate-name                     ?flatmate-name
-                                     :chore-completed-by-cleaner        ?chore-completed-by-cleaner
-                                     :chore-completed-by-other-flatmate ?chore-completed-by-other-flatmate
-                                     :flatmate-ill                      ?flatmate-ill})
-    #_(map->FlatMateReport {:chore-type                        ?chore-type-2
-                            :flatmate-name                     ?flatmate-name-2
-                            :chore-completed-by-cleaner        ?chore-completed-by-cleaner-2
-                            :chore-completed-by-other-flatmate ?chore-completed-by-other-flatmate-2
-                            :flatmate-ill                      ?flatmate-ill-2})
+  (insert-all! [(map->FlatMateReport {:chore-type                        ?chore-type
+                                      :flatmate-name                     ?flatmate-name
+                                      :chore-completed-by-cleaner        ?chore-completed-by-cleaner
+                                      :chore-completed-by-other-flatmate ?chore-completed-by-other-flatmate
+                                      :flatmate-ill                      ?flatmate-ill})
+
+
+                (map->FlatMateReport {:chore-type                        ?chore-type-2
+                                      :flatmate-name                     ?flatmate-name-2
+                                      :chore-completed-by-cleaner        ?chore-completed-by-cleaner-2
+                                      :chore-completed-by-other-flatmate ?chore-completed-by-other-flatmate-2
+                                      :flatmate-ill                      ?flatmate-ill-2})]
     #_(map->FlatMateReport {:chore-type                        ?chore-type-3
                             :flatmate-name                     ?flatmate-name-3
                             :chore-completed-by-cleaner        ?chore-completed-by-cleaner-3
