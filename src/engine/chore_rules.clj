@@ -48,7 +48,6 @@
   [chore-status flatmate-name]
   (and (= :completed chore-status) (not (= :missing flatmate-name))))
 
-
 (defrule create-flatmate-report
   "Turns weekly report into individual flatmate report data"
 
@@ -66,15 +65,12 @@
    (= ?chore-completed-by-cleaner (:chore-completed-by-cleaner flatmate-3-chores))
    (= ?chore-completed-by-other-flatmate (:chore-completed-by-other-flatmate flatmate-3-chores))
    (= ?flatmate-ill (:flatmate-ill flatmate-3-chores))]
-
   =>
   (insert! (map->BigReport {:result (map->FlatMateReport {:chore-type                        ?chore-type
                                                               :flatmate-name                     ?flatmate-name
                                                               :chore-completed-by-cleaner        ?chore-completed-by-cleaner
                                                               :chore-completed-by-other-flatmate ?chore-completed-by-other-flatmate
                                                               :flatmate-ill                      ?flatmate-ill})})))
-
-
 
   (defrule chore-checker
     "Updates the chore outcome for an individual flatmate"
