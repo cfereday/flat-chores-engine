@@ -76,38 +76,40 @@
                              :chore-completed-by-other-flatmate nil
                              :flatmate-ill                      nil}
 
-                            #_:chores-3 #_{:flatmate-3 {:chore-type                        :bathroom
-                                                        :flatmate-name                     "Christoph"
-                                                        :chore-completed-by-cleaner        nil
-                                                        :chore-completed-by-other-flatmate nil
-                                                        :flatmate-ill                      nil}}))
+                            {:chore-type                        :bathroom
+                             :flatmate-name                     "Christoph"
+                             :chore-completed-by-cleaner        nil
+                             :chore-completed-by-other-flatmate nil
+                             :flatmate-ill                      nil}))
                   (fire-rules))
         report-query (query session flatmate-reports)
-        movie-query (query session can-choose-a-movie?)
-        movie-mapped-query (into {} movie-query)
-        report-mapped-query (into [] (into {} report-query))
-        charlotte-report (first report-mapped-query)
-        felipe-report (first report-mapped-query)
+        movie-query (set (query session can-choose-a-movie?))
+        charlotte-movie (second movie-query)
+        felipe-movie (last movie-query)
+        christoph-movie (first movie-query)
+        charlotte-report (first report-query)
+        felipe-report (second report-query)
+        christoph-report (last report-query)]
 
-        ]
-    (prn "HERE IS REPORT query******" report-query)
-    (prn "HERE IS MOVIE query----------" movie-query)
-    (prn "HERE IS REPORT MAPPED query******" report-mapped-query)
-    (prn "HERE IS MOVIE MAPPED query----------" movie-mapped-query)
-    (prn "inspected session" (clojure.pprint/pprint (:insertions (inspect session))))
     (is (and
-          (= (:?eligibility movie-mapped-query) :pick-movie)
-          (= (:?flatmate-name movie-mapped-query) "Charlotte")))
+          (= (:?eligibility charlotte-movie) :pick-movie)
+          (= (:?flatmate-name charlotte-movie) "Charlotte")))
     (is (and
-          (= (:?eligibility movie-mapped-query) :pick-movie)
-          (= (:?flatmate-name movie-mapped-query) "Felipe")))
+          (= (:?eligibility felipe-movie) :pick-movie)
+          (= (:?flatmate-name felipe-movie) "Felipe")))
+    (is (and
+          (= (:?eligibility christoph-movie) :pick-movie)
+          (= (:?flatmate-name christoph-movie) "Christoph")))
 
     (is (and
           (= (:?chore-type charlotte-report) :vacuum)
           (= (:?flatmate-name charlotte-report) "Charlotte")))
     (is (and
           (= (:?chore-type felipe-report) :kitchen)
-          (= (:?flatmate-name felipe-report) "Felipe")))))
+          (= (:?flatmate-name felipe-report) "Felipe")))
+    (is (and
+          (= (:?chore-type christoph-report) :bathroom)
+          (= (:?flatmate-name christoph-report) "Christoph")))))
 
 
 (deftest checks-movie-picker
@@ -137,8 +139,7 @@
             (= (:?flatmate-name mapped-incomplete-query) "Charlotte")))
       (is (and
             (= (:?eligibility mapped-exempt-query) :no-movie-picking)
-            (= (:?flatmate-name mapped-incomplete-query) "Charlotte")))))
-  )
+            (= (:?flatmate-name mapped-incomplete-query) "Charlotte"))))))
 
 
 

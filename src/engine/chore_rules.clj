@@ -7,7 +7,7 @@
 
 (defrecord ChoreOutcome [chore-status flatmate-name chore])
 
-(defrecord WeeklyReport [chores1 chores2 #_chores3])
+(defrecord WeeklyReport [chores1 chores2 chores3])
 
 (defrecord MoviePicker [eligibility flatmate-name])
 
@@ -56,6 +56,13 @@
   [WeeklyReport (= ?chore-completed-by-other-flatmate-2 (:chore-completed-by-other-flatmate chores2)) (some? chores2)]
   [WeeklyReport (= ?flatmate-ill-2 (:flatmate-ill chores2)) (some? chores2)]
 
+
+  [WeeklyReport (= ?chore-type-3 (:chore-type chores3)) (some? chores3)]
+  [WeeklyReport (= ?flatmate-name-3 (:flatmate-name chores3)) (some? chores3)]
+  [WeeklyReport (= ?chore-completed-by-cleaner-3 (:chore-completed-by-cleaner chores3)) (some? chores3)]
+  [WeeklyReport (= ?chore-completed-by-other-flatmate-3 (:chore-completed-by-other-flatmate chores3)) (some? chores3)]
+  [WeeklyReport (= ?flatmate-ill-3 (:flatmate-ill chores3)) (some? chores3)]
+
   =>
   (insert-all! [(map->FlatMateReport {:chore-type                        ?chore-type
                                       :flatmate-name                     ?flatmate-name
@@ -68,12 +75,13 @@
                                       :flatmate-name                     ?flatmate-name-2
                                       :chore-completed-by-cleaner        ?chore-completed-by-cleaner-2
                                       :chore-completed-by-other-flatmate ?chore-completed-by-other-flatmate-2
-                                      :flatmate-ill                      ?flatmate-ill-2})]
-    #_(map->FlatMateReport {:chore-type                        ?chore-type-3
-                            :flatmate-name                     ?flatmate-name-3
-                            :chore-completed-by-cleaner        ?chore-completed-by-cleaner-3
-                            :chore-completed-by-other-flatmate ?chore-completed-by-other-flatmate-3
-                            :flatmate-ill                      ?flatmate-ill-3})))
+                                      :flatmate-ill                      ?flatmate-ill-2})
+
+                (map->FlatMateReport {:chore-type                        ?chore-type-3
+                                      :flatmate-name                     ?flatmate-name-3
+                                      :chore-completed-by-cleaner        ?chore-completed-by-cleaner-3
+                                      :chore-completed-by-other-flatmate ?chore-completed-by-other-flatmate-3
+                                      :flatmate-ill                      ?flatmate-ill-3})]))
 
   (defrule chore-checker
     "Updates the chore outcome for an individual flatmate"
@@ -104,19 +112,5 @@
       =>
       (insert! (map->MoviePicker {:eligibility ?status :flatmate-name ?name}))))
 
-
-
-  ;:todo notes for talk
-  ;Statements of facts based on other facts
-  ;Pass in a lot of raw data that can be handled by rules
-  ;Rules can handle multiple facts
-  ;Able to grow complexity for the queries without these interacting
-  ; flatmate & chore k
-  ;certain level of intricacy
-  ;chain of things - different ways to complete chores - do they need to be different rules? probably not, would want different queries
-  ;queries
-  ;count number of chores
-  ;when enough chores are done , insert all done
-  ;get to choose movie if all chores done & not exempt
 
 
