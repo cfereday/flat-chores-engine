@@ -3,6 +3,7 @@
 (def valid-chores
   {:bathroom true
    :kitchen  true
+   :living-room true
    :laundry  true
    :bins true})
 
@@ -16,8 +17,8 @@
   (cond (and (= (count (:chores weekly-flat-report)) 4) (map (:chores weekly-flat-report) valid-chore?))
         (assoc weekly-flat-report :status :completed :gets-beer true)
 
-        #_(= (:cleaner-hired weekly-flat-report) true)
-        #_(assoc weekly-flat-report :chores [:bathroom :kitchen :bins])
+        (= (:cleaner-hired weekly-flat-report) true)
+        (assoc weekly-flat-report :chores [:bathroom :living-room :kitchen])
 
         :else (assoc weekly-flat-report :status :incomplete :gets-beer false)))
 
