@@ -6,7 +6,7 @@
   [weekly-flat-report]
   (cond (= (count (:chores weekly-flat-report)) 4)
         (assoc weekly-flat-report :status :completed)
-        :else "hey"))
+        :else (assoc weekly-flat-report :status :incomplete)))
 
 
 

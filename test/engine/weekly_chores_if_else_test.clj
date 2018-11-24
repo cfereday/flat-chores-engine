@@ -5,7 +5,15 @@
 
 (deftest checks-chores
   (testing "If a flatmate has completed 4 chore their chore status is marked as completed"
-    (is (= (chores-checker {:chores [:bathroom :kitchen :laundry :bins] :name "Charlotte"}) {:chores [:bathroom :kitchen :laundry :bins] :name "Charlotte" :status :completed})))
+    (is (= (:status (chores-checker {:chores [:bathroom :kitchen :laundry :bins] :name "Charlotte"})) :completed)))
+
+  (testing "If a flatmate has completed 4 chore their chore status is marked as incomplete"
+    (is (= (:status (chores-checker {:chores [:bathroom] :name "Charlotte"}) :incomplete))))
+
+  #_(testing "If you've completed all your chores you'll get a beer"
+    (is (= (chores-checker )))
+
+    )
   )
 
 
