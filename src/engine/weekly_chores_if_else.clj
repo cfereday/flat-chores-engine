@@ -11,17 +11,19 @@
   [chore]
     (chore valid-chores))
 
-
 (defn chores-checker
   [weekly-flat-report]
   (cond (and (= (count (:chores weekly-flat-report)) 4) (map (:chores weekly-flat-report) valid-chore?))
         (assoc weekly-flat-report :status :completed :gets-beer true)
 
         (= (:cleaner-hired weekly-flat-report) true)
-        (assoc weekly-flat-report :chores [:bathroom :living-room :kitchen])
+        (assoc weekly-flat-report :chores [:bathroom :living-room :kitchen] :status :completed :gets-beer true)
 
         (= (:ill weekly-flat-report) true)
         (assoc weekly-flat-report :status :exempted :gets-beer false)
 
         :else (assoc weekly-flat-report :status :incomplete :gets-beer false)))
+
+
+
 

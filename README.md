@@ -21,6 +21,7 @@ lein test
 ## Collaborators
 
 Many thanks to [Felipe Sere](https://github.com/felipesere) who collaborated on the Chore Rules section and helped me deepen my understanding of Clara. 
+
 ## License
 
 Copyright © 2018 FIXME
