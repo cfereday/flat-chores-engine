@@ -18,23 +18,20 @@
 
 
 (defquery exemptions-query?
-  "Hi there shnuggles"
   []
   [?exemption <- Exemption])
 
 (defquery beer?
-  "do you get beer"
   []
   [?beer <- Beer])
 
 (defquery completed-chores?
-  "do you get beer"
   []
   [?x <- CompletedChore])
 
 
 (defrule ill-flatmates-are-exempt
-  "When you are ill, you are exempt of doing any chores"
+  "When you are ill, you are exempt from doing any chores"
   [FlatMate (= ?name name) (= was-ill true)]
   =>
   (insert! (->Exemption ?name)))
@@ -50,7 +47,7 @@
 
 
 (defrule need-to-complete-four-chores
-  "at least four chores are needed"
+  "at least three chores per flatmates are needed"
   [FlatMate (= ?name name)]
   [?c <- (acc/count) from (Chore (= ?name name))]
   [:test (> ?c 3)]
