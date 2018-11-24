@@ -20,5 +20,8 @@
         (= (:cleaner-hired weekly-flat-report) true)
         (assoc weekly-flat-report :chores [:bathroom :living-room :kitchen])
 
+        (= (:ill weekly-flat-report) true)
+        (assoc weekly-flat-report :status :exempted :gets-beer false)
+
         :else (assoc weekly-flat-report :status :incomplete :gets-beer false)))
 

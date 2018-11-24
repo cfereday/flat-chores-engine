@@ -18,4 +18,7 @@
 
   (testing "If a flatmate has hired a cleaner they will have 3 chores done for them:  bathroom, living room, kitchen"
     (is (= (:chores (chores-checker {:name "Charlotte" :cleaner-hired true})) [:bathroom :living-room :kitchen])))
+
+  (testing "If a flatmate is ill they're exempt from doing a chore"
+    (is (= (:status (chores-checker {:chores [:bathroom] :name "Charlotte" :ill true})) :exempted)))
   )
