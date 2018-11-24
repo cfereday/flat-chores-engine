@@ -21,4 +21,8 @@
 
   (testing "If a flatmate is ill they're exempt from doing a chore"
     (is (= (:status (chores-checker {:chores [:bathroom] :name "Charlotte" :ill true})) :exempted)))
-  )
+
+
+  (deftest chore-outcomes
+
+    ))

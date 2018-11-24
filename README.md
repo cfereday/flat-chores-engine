@@ -2,7 +2,7 @@
 
 ## About
 
-A toy project using [Clara rules](http://www.clara-rules.org/) to better understand them.
+A toy project using [Clara rules](http://www.clara-rules.org/) to better understand them. 
 
 This is a flat chores rules engine. It has as a comparison a conditional version of the same program not using the rules.
 
@@ -18,7 +18,9 @@ cd engine/
 lein test
 ```
 
+## Collaborators
 
+Many thanks to [Felipe Sere](https://github.com/felipesere) who collaborated on the Chore Rules section and helped me deepen my understanding of Clara. 
 ## License
 
 Copyright © 2018 FIXME
