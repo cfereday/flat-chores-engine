@@ -2,115 +2,64 @@
   (:require [clara.rules :refer :all]
             [clara.rules.accumulators :as acc]))
 
+(defrecord FlatMate [name was-ill paid-cleaner])
 
-(defrecord FlatMateReport [chore-type flatmate-name chore-completed-by-cleaner chore-completed-by-other-flatmate flatmate-ill])
+(defn make-flatmate [person]
+  (let [default-values {:was-ill false :paid-cleaner false}]
+    (map->FlatMate (merge default-values person))))
 
-(defrecord ChoreOutcome [chore-status flatmate-name chore])
+(defrecord Exemption [name])
 
-(defrecord WeeklyReport [chores1 chores2 chores3])
+(defrecord Chore [name activity])
 
-(defrecord MoviePicker [eligibility flatmate-name])
+(defrecord CompletedChore [name amount])
 
-(defquery flatmate-reports
-  "Querying that the flatmate report has been correctly made"
+(defrecord Beer [name])
+
+
+(defquery exemptions-query?
+  "Hi there shnuggles"
   []
-  [FlatMateReport (= ?chore-type chore-type) (= ?flatmate-name flatmate-name) (= ?chore-completed-by-cleaner chore-completed-by-cleaner) (= ?chore-completed-by-other-flatmate chore-completed-by-other-flatmate) (= ?flatmate-ill flatmate-ill)])
+  [?exemption <- Exemption])
 
-(defquery chore-outcomes
-  "Querying the chore outcome keys"
+(defquery beer?
+  "do you get beer"
   []
-  [ChoreOutcome (= ?chore-status chore-status) (= ?flatmate-name flatmate-name) (= ?chore chore)])
+  [?beer <- Beer])
 
-
-(defquery can-choose-a-movie?
-  "Checks if the flatmate is eligible to chose a movie"
+(defquery completed-chores?
+  "do you get beer"
   []
-  [MoviePicker (= ?eligibility eligibility) (= ?flatmate-name flatmate-name)])
+  [?x <- CompletedChore])
 
 
-(defn is-legitimate-chore?
-  [chore-type]
-  (contains? #{:vacuum :kitchen :bathroom} chore-type))
-
-(defn has-not-completed-a-chore?
-  [chore-or-ill]
-  (= '(true true true true) (map nil? chore-or-ill)))
-
-
-(defn is-eligible?
-  [chore-status flatmate-name]
-  (and (= :completed chore-status) (not (= :missing flatmate-name))))
-
-(defrule create-flatmate-report
-  "Turns weekly report into individual flatmate report data"
-  [WeeklyReport (= ?chore-type (:chore-type chores1)) (some? chores1)]
-  [WeeklyReport (= ?flatmate-name (:flatmate-name chores1)) (some? chores1)]
-  [WeeklyReport (= ?chore-completed-by-cleaner (:chore-completed-by-cleaner chores1)) (some? chores1)]
-  [WeeklyReport (= ?chore-completed-by-other-flatmate (:chore-completed-by-other-flatmate chores1)) (some? chores1)]
-  [WeeklyReport (= ?flatmate-ill (:flatmate-ill chores1)) (some? chores1)]
-
-
-  [WeeklyReport (= ?chore-type-2 (:chore-type chores2)) (some? chores2)]
-  [WeeklyReport (= ?flatmate-name-2 (:flatmate-name chores2)) (some? chores2)]
-  [WeeklyReport (= ?chore-completed-by-cleaner-2 (:chore-completed-by-cleaner chores2)) (some? chores2)]
-  [WeeklyReport (= ?chore-completed-by-other-flatmate-2 (:chore-completed-by-other-flatmate chores2)) (some? chores2)]
-  [WeeklyReport (= ?flatmate-ill-2 (:flatmate-ill chores2)) (some? chores2)]
-
-
-  [WeeklyReport (= ?chore-type-3 (:chore-type chores3)) (some? chores3)]
-  [WeeklyReport (= ?flatmate-name-3 (:flatmate-name chores3)) (some? chores3)]
-  [WeeklyReport (= ?chore-completed-by-cleaner-3 (:chore-completed-by-cleaner chores3)) (some? chores3)]
-  [WeeklyReport (= ?chore-completed-by-other-flatmate-3 (:chore-completed-by-other-flatmate chores3)) (some? chores3)]
-  [WeeklyReport (= ?flatmate-ill-3 (:flatmate-ill chores3)) (some? chores3)]
-
+(defrule ill-flatmates-are-exempt
+  "When you are ill, you are exempt of doing any chores"
+  [FlatMate (= ?name name) (= was-ill true)]
   =>
-  (insert-all! [(map->FlatMateReport {:chore-type                        ?chore-type
-                                      :flatmate-name                     ?flatmate-name
-                                      :chore-completed-by-cleaner        ?chore-completed-by-cleaner
-                                      :chore-completed-by-other-flatmate ?chore-completed-by-other-flatmate
-                                      :flatmate-ill                      ?flatmate-ill})
+  (insert! (->Exemption ?name)))
 
 
-                (map->FlatMateReport {:chore-type                        ?chore-type-2
-                                      :flatmate-name                     ?flatmate-name-2
-                                      :chore-completed-by-cleaner        ?chore-completed-by-cleaner-2
-                                      :chore-completed-by-other-flatmate ?chore-completed-by-other-flatmate-2
-                                      :flatmate-ill                      ?flatmate-ill-2})
-
-                (map->FlatMateReport {:chore-type                        ?chore-type-3
-                                      :flatmate-name                     ?flatmate-name-3
-                                      :chore-completed-by-cleaner        ?chore-completed-by-cleaner-3
-                                      :chore-completed-by-other-flatmate ?chore-completed-by-other-flatmate-3
-                                      :flatmate-ill                      ?flatmate-ill-3})]))
-
-  (defrule chore-checker
-    "Updates the chore outcome for an individual flatmate"
-    ;:todo consider refactoring the :completed cases as repetitive
-    ;:todo make this work for multiple flatmates
-    ;todo when enough chores add in an :chores-done
-    [:and
-     [:or
-      [FlatMateReport (= ?chore chore-type) (= ?status :completed) (is-legitimate-chore? chore-type)]
-      [FlatMateReport (= ?chore chore-completed-by-cleaner) (= ?status :completed) (is-legitimate-chore? chore-completed-by-cleaner)]
-      [FlatMateReport (= ?chore chore-completed-by-other-flatmate) (= ?status :completed) (is-legitimate-chore? chore-completed-by-other-flatmate)]
-      [FlatMateReport (= ?chore :missing) (= ?status :exempt) (some? flatmate-ill)]
-      [FlatMateReport (= ?chore :missing) (= ?status :incomplete) (has-not-completed-a-chore? (take-while nil? [chore-type chore-completed-by-cleaner chore-completed-by-other-flatmate flatmate-ill]))]
-      ]
-     [:or
-      [FlatMateReport (= ?name flatmate-name) (some? flatmate-name)]
-      [FlatMateReport (= ?name :missing) (nil? flatmate-name)]]]
-    =>
-    (insert! (map->ChoreOutcome {:chore-status ?status :chore ?chore :flatmate-name ?name}))
-
-    (defrule chore-outcome-checker
-      "Updates the movie picker for an individual flatmate"
-      ;:todo make this work for multiple flatmates
-      ;:todo add a check to see if all house chores have been completed
-      [:or
-       [ChoreOutcome (= ?status :pick-movie) (= ?name flatmate-name flatmate-name) (is-eligible? chore-status flatmate-name)]
-       [ChoreOutcome (= ?status :no-movie-picking) (= ?name flatmate-name) (not (is-eligible? chore-status flatmate-name))]]
-      =>
-      (insert! (map->MoviePicker {:eligibility ?status :flatmate-name ?name}))))
+(defrule cleaners-do-three-chores
+  "they clean the bathrooms, living room, and kitchen"
+  [FlatMate (= ?name name) (= paid-cleaner true)]
+  =>
+  (insert-all! [(->Chore ?name :bathroom)
+                (->Chore ?name :living-room)
+                (->Chore ?name :kitchen)]))
 
 
+(defrule need-to-complete-four-chores
+  "at least four chores are needed"
+  [FlatMate (= ?name name)]
+  [?c <- (acc/count) from (Chore (= ?name name))]
+  [:test (> ?c 3)]
+  =>
+  (insert! (->CompletedChore ?name ?c)))
 
+(defrule completed-chores-grants-beer
+  "get beer if you have completed your chores unless you are exempt"
+  [CompletedChore (= ?name name)]
+  [:not [Exemption (= ?name name)]]
+  =>
+  (insert! (->Beer ?name)))
