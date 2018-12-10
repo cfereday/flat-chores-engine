@@ -28,12 +28,10 @@ Many thanks to [Felipe Sere](https://github.com/felipesere) who collaborated on 
 
 * [Clarifying rules engines with Clara Rules](http://www.metasimple.org/2017/02/28/clarifying-rules-engines.html)
 * [Clara rules documentation](http://www.clara-rules.org/apidocs/0.9.0/clojure/clara.rules.html)
+* [Clara tools to inspect sessions - explained is especially useful](http://www.clara-rules.org/apidocs/0.13.0-RC4/clojure/clara.tools.inspect.html)
 * [Clara examples](https://github.com/cerner/clara-examples)
 
 ## License
-
-Copyright © 2018 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 
+MIT license 
 
 
